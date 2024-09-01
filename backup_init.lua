@@ -783,37 +783,6 @@ require('lazy').setup({
             },
           },
         },
-        -- ruff = {
-        --   settings = {
-        --     configuration = "~/.config/nvim/ruff.toml"
-        --   }
-        -- },
-        -- ruff = {
-        --   init_options = {
-        --     settings = {
-        --       -- configuration = "~/.config/nvim/ruff.toml",
-        --       lint = {
-        --         enable = true,
-        --         select = {"E4", "E7", "E9", "B", "ASYNC", "DTZ", "RET", "TCH", "ARG", "PL", "NPY", "RUF"},
-        --         ignore = {"F722", "RET504"}
-        --       },
-        --     }
-        --   }
-        -- },
-        -- pyright = {
-        --   settings = {
-        --     pyright = {
-        --       -- Using Ruff's import organizer
-        --       disableOrganizeImports = true,
-        --     },
-        --     python = {
-        --       analysis = {
-        --         -- Ignore all files for analysis to exclusively use Ruff for linting
-        --         ignore = { '*' },
-        --       },
-        --     },
-        --   },
-        -- },
         pyright = {},
         -- pyright = {
         --   settings = {
