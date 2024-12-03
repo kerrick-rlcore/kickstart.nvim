@@ -157,6 +157,10 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- folding with treesitter https://github.com/LazyVim/LazyVim/discussions/1233
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevelstart = 99
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -196,6 +200,10 @@ vim.keymap.set('i', 'kj', '<ESC>')
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
+
+-- nvimtree
+vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<CR>', { desc = 'nvimtree toggle window' })
+vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeFocus<CR>', { desc = 'nvimtree focus window' })
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -256,6 +264,16 @@ vim.api.nvim_command 'FormatDisable'
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  -- 'nvim-tree/nvim-web-devicons',
+
+  {
+    'nvim-tree/nvim-web-devicons',
+    opts = {},
+    -- opts = function()
+    --   -- dofile(vim.g.base46_cache .. "devicons")
+    --   return { override = require 'nvchad.icons.devicons' }
+    -- end,
+  },
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -383,7 +401,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      -- { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -748,7 +766,62 @@ require('lazy').setup({
       }
     end,
   },
-
+  { -- file managing , picker etc
+    'nvim-tree/nvim-tree.lua',
+    -- dependencies = {
+    --   'nvim-tree/nvim-web-devicons',
+    -- },
+    cmd = { 'NvimTreeToggle', 'NvimTreeFocus' },
+    -- config comes from nvchad
+    opts = function()
+      -- dofile(vim.g.base46_cache .. "nvimtree")
+      return {
+        filters = { dotfiles = false },
+        disable_netrw = true,
+        hijack_cursor = true,
+        sync_root_with_cwd = true,
+        update_focused_file = {
+          enable = true,
+          update_root = false,
+        },
+        view = {
+          width = 30,
+          preserve_window_proportions = true,
+        },
+        renderer = {
+          root_folder_label = false,
+          highlight_git = true,
+          indent_markers = { enable = true },
+          icons = {
+            glyphs = {
+              default = '󰈚',
+              folder = {
+                default = '',
+                empty = '',
+                empty_open = '',
+                open = '',
+                symlink = '',
+              },
+              git = { unmerged = '' },
+            },
+          },
+        },
+      }
+    end,
+  },
+  {
+    "antosha417/nvim-lsp-file-operations",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    -- Uncomment whichever supported plugin(s) you use
+      "nvim-tree/nvim-tree.lua",
+    -- "nvim-neo-tree/neo-tree.nvim",
+    -- "simonmclean/triptych.nvim"
+    },
+    config = function()
+  require('lsp-file-operations').setup()
+    end,
+  },
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -765,22 +838,6 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      -- format_on_save = function(bufnr)
-      --   -- Disable "format_on_save lsp_fallback" for languages that don't
-      --   -- have a well standardized coding style. You can add additional
-      --   -- languages here or re-enable it for the disabled ones.
-      --   local disable_filetypes = { c = true, cpp = true, python = true }
-      --   local lsp_format_opt
-      --   if disable_filetypes[vim.bo[bufnr].filetype] then
-      --     lsp_format_opt = 'never'
-      --   else
-      --     lsp_format_opt = 'fallback'
-      --   end
-      --   return {
-      --     timeout_ms = 500,
-      --     lsp_format = lsp_format_opt,
-      --   }
-      -- end,
       format_on_save = function(bufnr)
         -- Disable with a global or buffer-local variable
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
@@ -842,6 +899,22 @@ require('lazy').setup({
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+
+      -- autopairing of (){}[] etc
+      {
+        'windwp/nvim-autopairs',
+        opts = {
+          fast_wrap = {},
+          disable_filetype = { 'TelescopePrompt', 'vim' },
+        },
+        config = function(_, opts)
+          require('nvim-autopairs').setup(opts)
+
+          -- setup cmp for autopairs
+          local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
+          require('cmp').event:on('confirm_done', cmp_autopairs.on_confirm_done())
+        end,
+      },
     },
     config = function()
       -- See `:help cmp`
