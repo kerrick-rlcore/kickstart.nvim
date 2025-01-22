@@ -193,6 +193,9 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- quickfix naviation
+vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'Next in quickfix list' })
+vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Prev in quickfix list' })
 
 vim.keymap.set('i', 'jk', '<ESC>')
 vim.keymap.set('i', 'kj', '<ESC>')
@@ -265,7 +268,15 @@ require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   -- 'nvim-tree/nvim-web-devicons',
-
+  {
+    'stevearc/oil.nvim',
+    ---@module 'oil'
+    ---@type oil.SetupOpts
+    opts = {},
+    -- Optional dependencies
+    dependencies = { { "echasnovski/mini.icons", opts = {} } },
+    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
+  },
   {
     'nvim-tree/nvim-web-devicons',
     opts = {},
@@ -650,6 +661,7 @@ require('lazy').setup({
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      capabilities = vim.tbl_deep_extend('force', capabilities, require('lsp-file-operations').default_capabilities())
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -670,6 +682,7 @@ require('lazy').setup({
           capabilities = (function()
             local pyright_capabilities = vim.lsp.protocol.make_client_capabilities()
             pyright_capabilities.textDocument.publishDiagnostics.tagSupport.valueSet = { 2 }
+            pyright_capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = true -- https://www.reddit.com/r/neovim/comments/1ao6c5a/how_to_make_the_lsp_aware_of_changes_made_to/
             return pyright_capabilities
           end)(),
           settings = {
@@ -1128,5 +1141,6 @@ require('lazy').setup({
   },
 })
 
+require("oil").setup()
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
