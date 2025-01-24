@@ -204,10 +204,6 @@ vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
--- nvimtree
-vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<CR>', { desc = 'nvimtree toggle window' })
-vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeFocus<CR>', { desc = 'nvimtree focus window' })
-
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.highlight.on_yank()`
@@ -267,25 +263,21 @@ vim.api.nvim_command 'FormatDisable'
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-  -- 'nvim-tree/nvim-web-devicons',
   {
     'stevearc/oil.nvim',
     ---@module 'oil'
     ---@type oil.SetupOpts
-    opts = {},
+    opts = {
+      lsp_file_methods = {
+        enabled = true,
+        timeout_ms = 1000,
+        autosave_changes = "unmodified"
+      }
+    },
     -- Optional dependencies
     dependencies = { { "echasnovski/mini.icons", opts = {} } },
     -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
   },
-  {
-    'nvim-tree/nvim-web-devicons',
-    opts = {},
-    -- opts = function()
-    --   -- dofile(vim.g.base46_cache .. "devicons")
-    --   return { override = require 'nvchad.icons.devicons' }
-    -- end,
-  },
-
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
   -- keys can be used to configure plugin behavior/loading/etc.
@@ -700,22 +692,6 @@ require('lazy').setup({
               },
             },
           },
-          -- capabilities = (function()
-          --   local pyright_capabilities = vim.lsp.protocol.make_client_capabilities()
-          --   pyright_capabilities.textDocument.publishDiagnostics.tagSupport.valueSet = { 2 }
-          --   return pyright_capabilities
-          -- end)(),
-          -- settings = {
-          --   python = {
-          --     analysis = {
-          --       useLibraryCodeForTypes = true,
-          --       diagnosticSeverityOverrides = {
-          --         reportUnusedVariable = 'warning', -- or anything
-          --       },
-          --       typeCheckingMode = 'basic',
-          --     },
-          --   },
-          -- },
         },
         -- },
         rust_analyzer = {},
@@ -777,62 +753,6 @@ require('lazy').setup({
           end,
         },
       }
-    end,
-  },
-  { -- file managing , picker etc
-    'nvim-tree/nvim-tree.lua',
-    -- dependencies = {
-    --   'nvim-tree/nvim-web-devicons',
-    -- },
-    cmd = { 'NvimTreeToggle', 'NvimTreeFocus' },
-    -- config comes from nvchad
-    opts = function()
-      -- dofile(vim.g.base46_cache .. "nvimtree")
-      return {
-        filters = { dotfiles = false },
-        disable_netrw = true,
-        hijack_cursor = true,
-        sync_root_with_cwd = true,
-        update_focused_file = {
-          enable = true,
-          update_root = false,
-        },
-        view = {
-          width = 30,
-          preserve_window_proportions = true,
-        },
-        renderer = {
-          root_folder_label = false,
-          highlight_git = true,
-          indent_markers = { enable = true },
-          icons = {
-            glyphs = {
-              default = '󰈚',
-              folder = {
-                default = '',
-                empty = '',
-                empty_open = '',
-                open = '',
-                symlink = '',
-              },
-              git = { unmerged = '' },
-            },
-          },
-        },
-      }
-    end,
-  },
-  {
-    "antosha417/nvim-lsp-file-operations",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    -- Uncomment whichever supported plugin(s) you use
-      "nvim-tree/nvim-tree.lua",
-    -- "nvim-neo-tree/neo-tree.nvim",
-    -- "simonmclean/triptych.nvim"
-    },
-    config = function()
-  require('lsp-file-operations').setup()
     end,
   },
   { -- Autoformat
