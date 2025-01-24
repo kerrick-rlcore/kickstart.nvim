@@ -158,8 +158,8 @@ vim.opt.cursorline = true
 vim.opt.scrolloff = 10
 
 -- folding with treesitter https://github.com/LazyVim/LazyVim/discussions/1233
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 vim.opt.foldlevelstart = 99
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -267,15 +267,9 @@ require('lazy').setup({
     'stevearc/oil.nvim',
     ---@module 'oil'
     ---@type oil.SetupOpts
-    opts = {
-      lsp_file_methods = {
-        enabled = true,
-        timeout_ms = 1000,
-        autosave_changes = "unmodified"
-      }
-    },
+    opts = {},
     -- Optional dependencies
-    dependencies = { { "echasnovski/mini.icons", opts = {} } },
+    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
     -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
   },
   -- NOTE: Plugins can also be added by using a table,
@@ -653,7 +647,6 @@ require('lazy').setup({
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('lsp-file-operations').default_capabilities())
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -1061,6 +1054,16 @@ require('lazy').setup({
   },
 })
 
-require("oil").setup()
+require('oil').setup {
+  lsp_file_methods = {
+    -- Enable or disable LSP file operations
+    enabled = true,
+    -- Time to wait for LSP file operations to complete before skipping
+    timeout_ms = 1000,
+    -- Set to true to autosave buffers that are updated with LSP willRenameFiles
+    -- Set to "unmodified" to only save unmodified buffers
+    autosave_changes = 'unmodified',
+  },
+}
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
